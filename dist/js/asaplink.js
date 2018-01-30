@@ -35,8 +35,37 @@ var Asap = {
 
 
 	start: function(){
+		var self = this;
 		this.addLinks(this.defaultTarget);
+		window.onpopstate = function(event) {
+			// console.log(window.history);
+			self.restoreFromState(event.state);
+		};
+		this.saveInitialState();
 	},
+
+	evaluateScripts: function(source){
+		var scripts = source.querySelectorAll("script");
+		for(var i=0; i<scripts.length; i++){
+			eval(scripts[i].innerHTML);
+		}
+	},
+
+	saveInitialState: function(){
+		window.history.pushState({
+			title: document.querySelector("title").innerHTML,
+			body: document.body.innerHTML
+		}, "Asap", document.location.href);
+	},
+
+
+	restoreFromState: function(state){
+		document.title.innerHTML = state.title;
+		document.body.innerHTML = state.body;
+		Asap.evaluateScripts(document.body);
+		Asap.addLinks(document.body);
+	},
+
 
 	implementEvent(c){
 		var proto = Object.assign( {}, c.prototype);  			// Store originals proto
@@ -351,15 +380,21 @@ Asap.Visit.prototype = {
 
 	onRequestSuccess: function(response){
 		this.response = new Asap.Response(response);
+
+		var state = {
+			title: document.querySelector("title").innerHTML,
+			body: document.body.innerHTML,
+			animation: this.params.animationName,
+			date: Date.now()
+		};
+
 		this.updateBody();
 		this.updateHead();
 
-		window.history.pushState({
-			source: this.source.innerHTML, 
-			target: this.target.innerHTML,
-			date: Date.now(),
-			animation: this.params.animationName
-		}, "Asap", this.link.url.value);
+		window.history.pushState(state, "Asap", this.link.url.value);
+		console.log(state);
+
+		Asap.evaluateScripts(this.source);
 
 		document.dispatchEvent(Asap.events.load);
 	},
@@ -395,14 +430,7 @@ Asap.Visit.prototype = {
 	},
 
 	updateHead: function(){
-
-	},
-
-	evaluateScripts(){
-		var scripts = this.source.querySelectorAll("script");
-		for(var i=0; i<scripts.length; i++){
-			eval(scripts[i].innerHTML);
-		}
+		document.querySelector("title").innerHTML = this.response.contentParsed.querySelector("title").innerHTML;
 	},
 
 	initParameters: function(){
