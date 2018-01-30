@@ -44,3 +44,10 @@ gulp.task('scripts', function() {
 gulp.task('js:watch', function () {
   gulp.watch('./src/**/*.js', ['scripts']);
 });
+
+
+gulp.task('watch', function(){
+  gulp.watch('./src/**/*.js', ['scripts']);
+  gulp.watch('./src/assets/sass/**/*.sass', ['sass']);
+})
+
