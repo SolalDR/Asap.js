@@ -36,6 +36,13 @@ var Asap = {
 
 	start: function(){
 		this.addLinks(this.defaultTarget);
+	},
+
+	implementEvent(c){
+		var proto = Object.assign( {}, c.prototype);  			// Store originals proto
+		c.prototype = AbstractEvent.prototype; 					// Implement events methods 
+		c.prototype.constructor = c; 							// Override constructor
+		c.prototype = Object.assign(c.prototype, proto); 		// Merge originals proto
 	}
 
 };
@@ -99,32 +106,31 @@ function AbstractEvent () {
 	this.events = {};
 }
 
-AbstractEvent.prototype = {
 
-	// Add a new function to execute when "name" is dispatch 
-	on: function(name, callback) {
-		if (!this.events[name]) this.events[name] = [];
-		this.events[name].push(callback.bind(this));
-	},
+// Add a new function to execute when "name" is dispatch 
+AbstractEvent.prototype.on = function(name, callback) {
+	if (!this.events[name]) this.events[name] = [];
+	this.events[name].push(callback.bind(this));
+}
 
-	// Remove a function
-	off: function(name, callback){
-		if (!this.events[name]) return;
-		for (var i = 0; i < this.events[name].length; i++) {
-			if( this.events[name][i] == callback ) this.events[name].splice(i, 1);
-		}
-	},
-
-	// Dispatch the event, loop in this.events[name] and execute all the function in it
-	dispatch: function(name, event) {
-		if (!this.events[name]) return;
-		var callback;
-		for (var i = 0; i < this.events[name].length; i++){
-			callback = this.events[name][i];
-			callback(event);
-		}
+// Remove a function
+AbstractEvent.prototype.off = function(name, callback){
+	if (!this.events[name]) return;
+	for (var i = 0; i < this.events[name].length; i++) {
+		if( this.events[name][i] == callback ) this.events[name].splice(i, 1);
 	}
 }
+
+// Dispatch the event, loop in this.events[name] and execute all the function in it
+AbstractEvent.prototype.dispatch = function(name, event) {
+	if (!this.events[name]) return;
+	var callback;
+	for (var i = 0; i < this.events[name].length; i++){
+		callback = this.events[name][i];
+		callback(event);
+	}
+}
+
 
 
 /**
@@ -151,20 +157,19 @@ myFoo.on("load", function(){
 
 
 Asap.Link = function(node){
-	this.link = node; 					// Node
-	this.visits = [];					// If the link has been visited before
-	this.target = Asap.defaultTarget; 	// Target of the links (Set in Link attributes) [Node] 
-	this.animation = null;				// Animation on request callback (Set in Link attributes) [Asap.Animation]
-	this.callback = null;
+	this.link = node;
+	this.source = null;
+	this.animation = null;
+	this.target = null;
+
+	// If the link has been visited before
+	this.visits = [];
+
 	this.init();
 }
 
 
 Asap.Link.prototype = {
-
-	get visited() {
-		return this.visits.length > 0 ? true : false; 
-	},
 
 	onVisit: function(event){
 		this.visits.push(new Asap.Visit(this));
@@ -173,15 +178,20 @@ Asap.Link.prototype = {
 	
 	init: function(){
 		this.link.addEventListener("click", this.onVisit.bind(this));
-		this.srcSelector = this.link.getAttribute("data-source") ? this.link.getAttribute("data-source") : document.body;
-			
-		if(this.link.getAttribute("data-target") && document.querySelector(this.link.getAttribute("data-target")))
-			this.target	= document.querySelector(this.link.getAttribute("data-target"));
-
-		this.url = new Asap.Url(this.link.getAttribute("href"));
+		this.url = new Asap.Url(this.link.getAttribute("href"));		
+		
+		if(this.link.getAttribute("data-source")) this.source = this.link.getAttribute("data-source");
+		if(this.link.getAttribute("data-target")) this.target = this.link.getAttribute("data-target");
+		if(this.link.getAttribute("data-animation")) this.animation = this.link.getAttribute("data-animation");
 	}
 
 }
+
+
+
+
+
+
 
 
 Asap.Request = function(arg) {
@@ -263,19 +273,6 @@ Asap.Response.prototype = {
 		this.parser = new DOMParser();
 		this.contentParsed = this.parser.parseFromString(this.content, "text/html");
 
-		document.body = this.contentParsed.body;
-		Asap.addLinks(document.body);
-
-		document.dispatchEvent(Asap.events.load);
-		var scripts = document.body.querySelectorAll("script");
-		for(var i=0; i<scripts.length; i++){
-			eval(scripts[i].innerHTML);
-		}
-
-	},
-
-	evaluate: function(){
-
 	}
 
 }
@@ -336,13 +333,86 @@ Asap.Url.prototype = {
 }
 Asap.Visit = function(link){
 	var self = this;
-	this.request = new Asap.Request(link.url)
-	
-	this.request.on("success", function(e){
-		self.response = new Asap.Response(e.response);
-	});
+	this.link = link;
+	this.target = null; 
+	this.source = null;
+	this.request = new Asap.Request(link.url);
 
-	Asap.requests.push(this.request);
+	this.initParameters();
+
+	this.request.on("success", function(e){
+		self.onRequestSuccess(e.response);
+		Asap.requests.push(self.request);
+	});
+}
+
+
+Asap.Visit.prototype = {
+
+	onRequestSuccess: function(response){
+		this.response = new Asap.Response(response);
+		this.updateBody();
+		this.updateHead();
+
+		window.history.pushState({
+			source: this.source.innerHTML, 
+			target: this.target.innerHTML,
+			date: Date.now(),
+			animation: this.params.animationName
+		}, "Asap", this.link.url.value);
+
+		document.dispatchEvent(Asap.events.load);
+	},
+
+	queryTarget: function(){
+		if( this.params.targetSelector ){
+			this.target = this.response.contentParsed.body.querySelector(this.params.targetSelector);
+			if( !this.target ) {
+				console.warn("Asap : Selector data-target was not valid, \""+this.params.targetSelector+"\" has been replace by \"body\"");
+			}
+		}
+		if( !this.target ) this.target = this.response.contentParsed.body;
+	},
+
+	querySource: function(){
+		if( this.params.sourceSelector ){
+			this.source = document.querySelector(this.params.sourceSelector); 
+			if( !this.source ) {
+				console.warn("Asap : Selector data-source was not valid, \""+this.params.sourceSelector+"\" has been replace by \"body\"");	
+			} 
+		}
+		if( !this.source ) this.source = Asap.defaultTarget; 
+	},
+
+	updateBody: function(){
+		
+		this.queryTarget();
+		this.querySource();
+
+		this.source.innerHTML = this.target.innerHTML;
+
+		Asap.addLinks(this.source);
+	},
+
+	updateHead: function(){
+
+	},
+
+	evaluateScripts(){
+		var scripts = this.source.querySelectorAll("script");
+		for(var i=0; i<scripts.length; i++){
+			eval(scripts[i].innerHTML);
+		}
+	},
+
+	initParameters: function(){
+		this.params = {
+			sourceSelector: this.link.source,
+			targetSelector: this.link.target,
+			animationName: this.link.animation
+		}
+	}
+
 }
 
 

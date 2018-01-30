@@ -36,6 +36,13 @@ var Asap = {
 
 	start: function(){
 		this.addLinks(this.defaultTarget);
+	},
+
+	implementEvent(c){
+		var proto = Object.assign( {}, c.prototype);  			// Store originals proto
+		c.prototype = AbstractEvent.prototype; 					// Implement events methods 
+		c.prototype.constructor = c; 							// Override constructor
+		c.prototype = Object.assign(c.prototype, proto); 		// Merge originals proto
 	}
 
 };

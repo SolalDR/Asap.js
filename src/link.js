@@ -1,18 +1,17 @@
 Asap.Link = function(node){
-	this.link = node; 					// Node
-	this.visits = [];					// If the link has been visited before
-	this.target = Asap.defaultTarget; 	// Target of the links (Set in Link attributes) [Node] 
-	this.animation = null;				// Animation on request callback (Set in Link attributes) [Asap.Animation]
-	this.callback = null;
+	this.link = node;
+	this.source = null;
+	this.animation = null;
+	this.target = null;
+
+	// If the link has been visited before
+	this.visits = [];
+
 	this.init();
 }
 
 
 Asap.Link.prototype = {
-
-	get visited() {
-		return this.visits.length > 0 ? true : false; 
-	},
 
 	onVisit: function(event){
 		this.visits.push(new Asap.Visit(this));
@@ -21,13 +20,18 @@ Asap.Link.prototype = {
 	
 	init: function(){
 		this.link.addEventListener("click", this.onVisit.bind(this));
-		this.srcSelector = this.link.getAttribute("data-source") ? this.link.getAttribute("data-source") : document.body;
-			
-		if(this.link.getAttribute("data-target") && document.querySelector(this.link.getAttribute("data-target")))
-			this.target	= document.querySelector(this.link.getAttribute("data-target"));
-
-		this.url = new Asap.Url(this.link.getAttribute("href"));
+		this.url = new Asap.Url(this.link.getAttribute("href"));		
+		
+		if(this.link.getAttribute("data-source")) this.source = this.link.getAttribute("data-source");
+		if(this.link.getAttribute("data-target")) this.target = this.link.getAttribute("data-target");
+		if(this.link.getAttribute("data-animation")) this.animation = this.link.getAttribute("data-animation");
 	}
 
 }
+
+
+
+
+
+
 
