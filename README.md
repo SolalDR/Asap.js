@@ -2,6 +2,7 @@
 
 [![codebeat badge](https://codebeat.co/badges/cccf2811-305f-4b8c-be2a-b1185f60240e)](https://codebeat.co/projects/github-com-solaldr-asap-js-master)
 [![Maintainability](https://api.codeclimate.com/v1/badges/7b84dccff13eb4395c81/maintainability)](https://codeclimate.com/github/SolalDR/Asap.js/maintainability)
+[![Build Status](https://travis-ci.org/SolalDR/Asap.js.svg?branch=master)](https://travis-ci.org/SolalDR/Asap.js)
 
 Create a smooth and animated navigation through your web pages. 
 A click on a link generate a XHR request and load the content asynchronous. 
