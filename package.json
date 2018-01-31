@@ -5,21 +5,23 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "test": "mocha"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "gulp": "latest",
-    "gulp-load-plugins": "latest",
-    "gulp-rename": "latest",
+    "gulp-autoprefixer": "latest",
+    "gulp-concat": "latest",
+    "gulp-cssbeautify": "latest",
+    "gulp-csscomb": "latest",
     "gulp-csso": "latest",
     "gulp-less": "latest",
-    "gulp-csscomb": "latest",
-    "gulp-cssbeautify": "latest",
-    "gulp-autoprefixer": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-rename": "latest",
     "gulp-sass": "latest",
-    "gulp-concat": "latest",
-    "gulp-uglify": "latest"
+    "gulp-uglify": "latest", 
+    "mocha": "latest"
   }
 }
