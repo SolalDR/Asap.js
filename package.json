@@ -1,15 +1,19 @@
 {
-  "name": "asaplink",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "asap-js",
+  "version": "0.1.0",
+  "description": "Create a smooth and animated navigation through your web pages.",
+  "main": "dist/js/asap.js",
   "scripts": {
     "watch": "gulp watch",
     "test": "mocha",
     "coverage": "node node_modules/.bin/istanbul cover _mocha -- -R spec",
     "coveralls": "cat ./coverage/lcov.info | node node_modules/.bin/coveralls"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SolalDR/Asap.js"
+  },
+  "author": "Solal Dussout-Revel",
   "license": "ISC",
   "devDependencies": {
     "chai": "^4.1.2",

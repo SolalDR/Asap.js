@@ -37,7 +37,7 @@ gulp.task('css', function () {
 
 gulp.task('scripts', function() {
     return gulp.src("src/**/*.js")
-        .pipe(concat('asaplink.js'))
+        .pipe(concat('asap.js'))
         .pipe(gulp.dest("dist/js"));
 });
 
