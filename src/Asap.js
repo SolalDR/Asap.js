@@ -16,8 +16,7 @@ var Asap = {
 		selector: {
 			target: "body",
 			source: "body"
-		},
-		source: document.body
+		}
 	},
 
 	config: {},
@@ -33,7 +32,7 @@ var Asap = {
 	/* Custom events list */
 	events: {
 		/* Dispatch when a new visit is end */
-		load: new Event("asap:load", { "bubbles":false, "cancelable": true})
+		load: new Event("asap:load", { "bubbles":false, "cancelable": false}),
 	},
 
 
@@ -130,10 +129,8 @@ var Asap = {
 			this.config.source = document.querySelector(this.config.selector.source);
 		} else {
 			this.config.selector.source = this.default.selector.source;
-			this.config.source = this.default.source;
+			this.config.source = document.body;
 		}
-
-		console.log(this.config.source);
 	},
 
 

@@ -5,6 +5,8 @@ Asap.Visit = function(link){
 	this.source = null;
 	this.request = new Asap.Request(link.url);
 
+	this.autoload = true;
+
 	this.initParameters();
 
 	this.request.on("success", function(e){
@@ -19,22 +21,21 @@ Asap.Visit.prototype = {
 	onRequestSuccess: function(response){
 		this.response = new Asap.Response(response);
 
-		var state = {
+		this.state = {
 			title: document.querySelector("title").innerHTML,
 			body: document.body.innerHTML,
 			animation: this.params.animationName,
 			date: Date.now()
 		};
 
-		this.updateBody();
-		this.updateHead();
+		this.queryTarget();
+		this.querySource();
 
-		window.history.pushState(state, "Asap", this.link.url.value);
-		console.log(state);
-
-		Asap.evaluateScripts(this.source);
-
-		document.dispatchEvent(Asap.events.load);
+		this.autoload = document.dispatchEvent( new CustomEvent("asap:before-load", { detail: this, "cancelable": true }) );
+			
+		if( this.autoload ){
+			this.load();	
+		}
 	},
 
 	queryTarget: function(){
@@ -57,13 +58,20 @@ Asap.Visit.prototype = {
 		if( !this.source ) this.source = Asap.config.source; 
 	},
 
+	load: function(){
+		this.updateBody();
+		this.updateHead();
+
+		window.history.pushState(this.state, "Asap", this.link.url.value);
+
+		Asap.evaluateScripts(this.source);
+
+
+		document.dispatchEvent(new CustomEvent("asap:load", { "bubbles":false, "cancelable": false, "detail": this });
+	},
+
 	updateBody: function(){
-		
-		this.queryTarget();
-		this.querySource();
-
 		this.source.innerHTML = this.target.innerHTML;
-
 		Asap.addLinks(this.source);
 	},
 
