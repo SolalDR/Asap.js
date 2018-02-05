@@ -10,7 +10,7 @@ Asap.Link = function(node){
 
 	this.source = null;
 	this.animation = null;
-	this.target = null;
+	this.target = Asap.config.selector.target;
 	this.nativeTarget = "_self";
 
 	// If the link has been visited before
@@ -44,7 +44,6 @@ Asap.Link.prototype = {
 			event.preventDefault();
 		}
 	},
-
 
 	/**
 	 * Manage html attributes

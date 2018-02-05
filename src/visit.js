@@ -54,7 +54,7 @@ Asap.Visit.prototype = {
 				console.warn("Asap : Selector data-source was not valid, \""+this.params.sourceSelector+"\" has been replace by \"body\"");	
 			} 
 		}
-		if( !this.source ) this.source = Asap.defaultTarget; 
+		if( !this.source ) this.source = Asap.config.source; 
 	},
 
 	updateBody: function(){

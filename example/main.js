@@ -1,5 +1,8 @@
 window.addEventListener("load", function(){
-	Asap.start();
+	Asap.start({
+		targetSelector: "#body",
+		sourceSelector: "#body"
+	});
 }, false)
 
 document.addEventListener("asap:load", function(){
