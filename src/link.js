@@ -12,7 +12,6 @@ Asap.Link = function(node){
 
 
 Asap.Link.prototype = {
-
 	onVisit: function(event){
 		this.visits.push(new Asap.Visit(this));
 		if( this.url.type !== this.url.types.UNDEFINED ) event.preventDefault();
@@ -26,7 +25,6 @@ Asap.Link.prototype = {
 		if(this.link.getAttribute("data-target")) this.target = this.link.getAttribute("data-target");
 		if(this.link.getAttribute("data-animation")) this.animation = this.link.getAttribute("data-animation");
 	}
-
 }
 
 

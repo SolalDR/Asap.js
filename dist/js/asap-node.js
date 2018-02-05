@@ -402,3 +402,4 @@ Asap.Visit.prototype = {
 	}
 
 }
+export default Asap;

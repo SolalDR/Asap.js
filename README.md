@@ -7,12 +7,35 @@
 Create a smooth and animated navigation through your web pages. 
 A click on a link generate a XHR request and load the content asynchronous. 
 
-
 ## How to use
 
+### With npm
+``` bash
+npm install asap-js
+```
+``` javascript
+// In your main script
+var Asap = require("asap-js");
+
+// In your main script (be careful, the script must be present in each page to be launched on the first load)
+window.addEventListener("load", function(){
+  Asap.start();
+})
+```
+
+### With git
+``` bash
+git clone https://github.com/SolalDR/Asap.js.git
+```
 Add the script in the head of your documents (don't forget defer)
 ``` html
-<script defer src="path/to/asaplink.js"></script>
+<script defer src="path/to/asap-js/dist/asap.js"></script>
+```
+``` javascript
+// In your main script (be careful, the script must be present in each page to be launched on the first load)
+window.addEventListener("load", function(){
+  Asap.start();
+})
 ```
 
 ## How does it work

@@ -6,12 +6,8 @@ Asap.Response = function(response){
 
 
 Asap.Response.prototype = {
-	
 	parse: function(){
-
 		this.parser = new DOMParser();
 		this.contentParsed = this.parser.parseFromString(this.content, "text/html");
-
 	}
-
 }

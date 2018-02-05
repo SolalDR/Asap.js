@@ -80,8 +80,3 @@ Asap.Visit.prototype = {
 	}
 
 }
-
-
-window.onload = function(){
-	Asap.start();
-}

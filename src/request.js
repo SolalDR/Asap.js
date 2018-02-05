@@ -1,5 +1,4 @@
 Asap.Request = function(arg) {
-
 	AbstractEvent.call(this);
 	if (arg instanceof Asap.Url) {
 		this.url = arg.value
@@ -54,11 +53,7 @@ Asap.Request.prototype = Object.assign(Asap.Request.prototype, {
 		}
 		this.xhr.send(null);
 		return this;
-	},
-
-	init: function(){
-
 	}
-
+	
 }); 
 

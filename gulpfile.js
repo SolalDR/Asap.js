@@ -25,6 +25,10 @@ gulp.task('sass:watch', function () {
   gulp.watch('./src/assets/sass/**/*.sass', ['sass']);
 });
 
+gulp.task('js:watch', function () {
+  gulp.watch('./src/**/*.js', ['scripts']);
+});
+
 
 
 
@@ -35,19 +39,31 @@ gulp.task('css', function () {
 });
 
 
+var scripts = [
+  "src/helpers/*.js",
+  "src/Asap.js",
+  "src/link.js",
+  "src/request.js",
+  "src/response.js",
+  "src/url.js",
+  "src/visit.js"
+];
+
+
 gulp.task('scripts', function() {
-    return gulp.src("src/**/*.js")
+    return gulp.src(scripts)
         .pipe(concat('asap.js'))
         .pipe(gulp.dest("dist/js"));
 });
 
-gulp.task('js:watch', function () {
-  gulp.watch('./src/**/*.js', ['scripts']);
-});
-
+gulp.task('publish', function() {
+    return gulp.src(["dist/js/asap.js", "src/.npm-export.js"])
+        .pipe(concat('asap-node.js'))
+        .pipe(gulp.dest("dist/js"));
+})
 
 gulp.task('watch', function(){
-  gulp.watch('./src/**/*.js', ['scripts']);
+  gulp.watch('./src/**/*.js', ['scripts', 'publish']);
   gulp.watch('./src/assets/sass/**/*.sass', ['sass']);
 })
 

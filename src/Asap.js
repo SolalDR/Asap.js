@@ -58,7 +58,6 @@ var Asap = {
 		}, "Asap", document.location.href);
 	},
 
-
 	restoreFromState: function(state){
 		document.title.innerHTML = state.title;
 		document.body.innerHTML = state.body;
