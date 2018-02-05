@@ -156,40 +156,77 @@ var Asap = {
 
 };
 
+
+/**
+ * Asap.Link represent an html link. 
+ * It is used to instantiate new Asap.Visit on click and manage special attributes
+ * @constructor 
+ * @param {Node} node The <a> element 
+ */
 Asap.Link = function(node){
 	this.link = node;
+
 	this.source = null;
 	this.animation = null;
 	this.target = null;
+	this.nativeTarget = "_self";
 
 	// If the link has been visited before
 	this.visits = [];
 
-	this.init();
+	this.initConfig();
+	this.initEvents();
 }
 
 
 Asap.Link.prototype = {
+
+	/**
+	 * The list of availables attributes for HTML Element
+	 */
+	AVAILABLES: {
+		source: "data-asap-source",
+		target: "data-asap-target",
+		animate: "data-asap-animate",
+		off: "data-asap-off"
+	},
+
+
+	/**
+	 * Click event
+	 * @param {object} event 
+	 */
 	onVisit: function(event){
 		this.visits.push(new Asap.Visit(this));
-		if( this.url.type !== this.url.types.UNDEFINED ) event.preventDefault();
+		if( this.url.type !== this.url.types.UNDEFINED ) {
+			event.preventDefault();
+		}
+	},
+
+
+	/**
+	 * Manage html attributes
+	 */
+	initConfig: function(){
+		if(this.link.getAttribute(this.AVAILABLES.source)) this.source = this.link.getAttribute(this.AVAILABLES.source);
+		if(this.link.getAttribute(this.AVAILABLES.target)) this.target = this.link.getAttribute(this.AVAILABLES.target);
+		if(this.link.hasAttribute(this.AVAILABLES.animate)) this.animation = true;
+		if(this.link.hasAttribute(this.AVAILABLES.off)) this.enable = false;
+		if(this.link.hasAttribute("target")) this.nativeTarget = this.link.getAttribute("target");
 	},
 	
-	init: function(){
-		this.link.addEventListener("click", this.onVisit.bind(this));
+
+	/**
+	 * Init click events
+	 */
+	initEvents: function(){
 		this.url = new Asap.Url(this.link.getAttribute("href"));		
 		
-		if(this.link.getAttribute("data-source")) this.source = this.link.getAttribute("data-source");
-		if(this.link.getAttribute("data-target")) this.target = this.link.getAttribute("data-target");
-		if(this.link.getAttribute("data-animation")) this.animation = this.link.getAttribute("data-animation");
+		if( !this.enable && this.url.valid && this.nativeTarget === "_self" ){
+			this.link.addEventListener("click", this.onVisit.bind(this));
+		}
 	}
 }
-
-
-
-
-
-
 
 
 Asap.Request = function(arg) {
@@ -265,61 +302,133 @@ Asap.Response.prototype = {
 		this.contentParsed = this.parser.parseFromString(this.content, "text/html");
 	}
 }
+
+/**
+ * Asap.Url 
+ *
+ * Represent an URL formated 
+ * It is used to transform a classic href to a formatted url. 
+ * It deal with cross-domain, relative, absolute url
+ *
+ * @constructor 
+ * @param {String} href The href attribute of Asap.Link element 
+ */
 Asap.Url = function(href){
 
-	this.href = href;	
-	this.value = null;
-	
-	 
-	if( this.href.match( this.regexp.relative ) ){ // If href is a relatif path
-	
+	this.href = href;	// (string) Href attribute
+	this.value = null;	// (string) Url formated
+	this.valid = true;	// (boolean) 
+		
+	this.format();
+}
+
+
+Asap.Url.prototype = {
+
+	/**
+	 * List of availables status
+	 */
+	types: {
+		RELATIVE: 1,
+		ABSOLUTE: 2,
+		ROOT: 3,
+		CROSSDOMAIN: 4,
+		UNDEFINED: 5 // mailto, javascript, ftp, file, tel, has
+	},
+
+
+	/**
+	 * List of regexp used in different case
+	 */
+	regexp: {
+		relative: /^(?:\.+?\/|[\w\.]+$)/,		// ex : ./test/index.html || ../../test.css || index.html
+		root: /^\/.+?$/,						// ex : /test/test.html
+		dir: /\/$/,								// ex : https://test.com/test/
+		fileOrDir: /\/([\w\.]+)?$/, 			// ex : https://test.com/test/index.html || https://test.com/test/
+		url: /https?:\/\/(?:((?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}|localhost))\b[-a-zA-Z0-9@:%_\+.~#?&\/=]*/i
+	},
+
+
+	/**
+	 * Format a relative path in url
+	 * ex : './path/to/something'
+	 * @return void
+	 */
+	formatRelative: function(){
 		var base = document.location.href;
 
 		// If current url is a path to a file or a dir
 		if( base.match( this.regexp.fileOrDir ) ){
 			base = base.replace(this.regexp.fileOrDir, "/");
 		}
+
 		this.value = base + this.href; 
 		this.type = this.types.RELATIVE;
+	},
 
-	
-	} else if( this.href.match( this.regexp.root )){  // If href is a absolute path
-		
+
+	/**
+	 * Format a absolute path in url
+	 * ex : '/path/to/something/else'
+	 * @return void
+	 */
+	formatAbsolute: function(){
 		var base = document.location.origin;
 		this.value = base + this.href; 
 		this.type = this.types.ROOT;
-	
-	} else if (href.match( this.regexp.url )) { // If href is a full url
-
-		this.value = this.href; 
-		this.type = this.types.ABSOLUTE;
-
-	} else { // we don't care 
-
-		this.type = this.types.UNDEFINED
-
-	}
-}
-
-
-Asap.Url.prototype = {
-
-	regexp: {
-		relative: /^(?:\.+?\/|[\w\.]+$)/,		// ex : ./test/index.html || ../../test.css || index.html
-		root: /^\/.+?$/,						// ex : /test/test.html
-		dir: /\/$/,								// ex : https://test.com/test/
-		fileOrDir: /\/([\w\.]+)?$/, 			// ex : https://test.com/test/index.html || https://test.com/test/
-		url: /((https?|ftp):\/\/)?([a-z0-9+!*(),;?&=$_.-]+(:[a-z0-9+!*(),;?&=$_.-]+)?@)?([a-z0-9\-\.]*)\.(([a-z]{2,4})|([0-9]{1,3}\.([0-9]{1,3})\.([0-9]{1,3})))(:[0-9]{2,5})?(\/([a-z0-9+$_%-]\.?)+)*\/?(\?[a-z+&\$_.-][a-z0-9;:@&%=+\/$_.-]*)?(#[a-z_.-][a-z0-9+$%_.-]*)?/
 	},
 
-	types: {
-		RELATIVE: 1,
-		ABSOLUTE: 2,
-		ROOT: 3,
-		UNDEFINED: 4 // mailto, javascript, ftp, file, tel, has
-	}
 
+	/**
+	 * Format a full url and check Cross-Domain url
+	 * @return void
+	 */
+	formatUrl: function(){
+		var urlMatch = this.href.match(this.regexp.url);
+
+		// match 1 represent host 
+		if( urlMatch[1] && urlMatch[1] == document.location.host ){
+			this.value = this.href;
+			this.type = this.types.ABSOLUTE;
+		} else {
+			this.type = this.types.CROSSDOMAIN;
+			this.valid = false;
+		}
+	},
+
+
+	/**
+	 * Main function which match the good url pattern and format it
+	 * @return void
+	 */
+	format: function(){
+
+		// If href is a relatif path
+		if( this.href.match( this.regexp.relative ) ){ 
+	
+			this.formatRelative();
+		
+		// If href is a absolute path
+		} else if( this.href.match( this.regexp.root )){  
+			
+			this.formatAbsolute();
+
+		// If href is a full url
+		} else if (this.href.match( this.regexp.url )) { 
+
+			this.formatUrl();
+
+		// undefined, we don't care 
+		} else { 
+
+			this.type = this.types.UNDEFINED
+			this.valid = false;
+
+		}
+	}
 }
+
+
 Asap.Visit = function(link){
 	var self = this;
 	this.link = link;
