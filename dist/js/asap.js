@@ -66,7 +66,6 @@ var Asap = {
 		Asap.addLinks(document.body);
 	},
 
-
 	implementEvent(c){
 		var proto = Object.assign( {}, c.prototype);  			// Store originals proto
 		c.prototype = AbstractEvent.prototype; 					// Implement events methods 
