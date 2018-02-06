@@ -4,9 +4,9 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/7b84dccff13eb4395c81/maintainability)](https://codeclimate.com/github/SolalDR/Asap.js/maintainability)
 [![Build Status](https://travis-ci.org/SolalDR/Asap.js.svg?branch=master)](https://travis-ci.org/SolalDR/Asap.js)
 [![npm version](https://badge.fury.io/js/asap-js.svg)](https://badge.fury.io/js/asap-js)
+[![experimental](http://hughsk.github.io/stability-badges/dist/experimental.svg)](http://github.com/hughsk/stability-badges)
 
-Create a smooth and animated navigation through your web pages. 
-A click on a link generate a XHR request and load the content asynchronous. 
+Create a smooth and animated navigation through your web pages.
 
 ## Installation
 
@@ -17,7 +17,8 @@ npm install asap-js
 ``` javascript
 var Asap = require("asap-js");
 
-// In your main script (be careful, the script must be present in each page to be launched on the first load)
+/* In your main script 
+be careful, the script must be present in each page to be launched on the first load */
 window.addEventListener("load", function(){
   Asap.start();
 })
@@ -32,7 +33,8 @@ Add the script in the head of your documents (don't forget defer)
 <script defer src="path/to/asap-js/dist/asap.js"></script>
 ```
 ``` javascript
-// In your main script (be careful, the script must be present in each page to be launched on the first load)
+/* In your main script 
+be careful, the script must be present in each page to be launched on the first load */
 window.addEventListener("load", function(){
   Asap.start();
 })
@@ -44,32 +46,31 @@ window.addEventListener("load", function(){
 
 ### Configuration
 
-The configuration of Asap.js can be done in two ways. Either by passing a literal object when launching the `Asap.start()` method, or link by link with html attributes.
+The configuration of Asap.js can be done in two ways. Either by passing a literal object when executing the `Asap.start()` method, or link by link with html data-attributes.
 
 #### Initialisation
 
-By default, Asap.js will update the entire document. However, it may be desirable to update only part of the document if you need for example to keep your header or a video playing in background. 
+By default, Asap.js will update the entire document. However, it may be desirable to update only part of the document.
+This can be usefull for example to keep a header or a video playing in background. 
 
 For this reason, you can override this default behavior during the initialisation.
-In the example below, only the node with id "myCustomElement2" will be catch and his content will replace the content of the node with id "myCustomElement2".
+In the example below, the node `#myCustomElement2` will replace the content of the node `#myCustomElement2`.
 
  ``` javascript
 document.addEventListener("load", function(){
-	
 	Asap.start({
 		sourceSelector: "#myCustomElement",
 		targetSelector: "#myCustomElement2"
 	})
-
 });
 ```
 
 #### Attributes
 
-Several attributes are available to override the default behaviors.
+Several html attributes are available to override the default behaviors.
 
-- `data-asap-source` : The html node selector whose content will be replaced
-- `data-asap-target` : The node selector whose contents will be retrieved after the ajax response
+- `data-asap-source` : The CSS selector of the source element; The source element represents the html node that will contain the resulting content returned by the query after the update.  If this attribute is not specified, the source selector by default will be "body" so the response will replace the entire page.
+- `data-asap-target` : The CSS selector of the target element. The target element represents the node that contains the content to retrieve within the request. If this attribute is not specified, the target selector by default will be "body" so the entire loaded page will be returned.
 - `data-asap-off` : The link will works in the normal way
 
 
@@ -128,3 +129,31 @@ document.addEventListener("asap:before-load", function(e){
 ## Compatibility
 
 Asap.js is write in ES5 syntax.
+
+## Contribute
+
+Install the package
+``` bash
+git clone https://github.com/SolalDR/Asap.js.git
+```
+
+Install dependencies
+``` bash
+npm install
+```
+
+Launch watching
+``` bash
+npm run watch
+```
+
+## Todo 1.0.0
+
+- Implement history back & forward
+- Event asap:before-send : Which is fire before a new request is send
+- Implement events directly on Asap.Link object to create custom callback link by link.
+- Control content-type in response's headers
+- Implement animation system
+- Documentation
+- Coverage
+
