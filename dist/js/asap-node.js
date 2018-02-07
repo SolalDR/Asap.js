@@ -504,6 +504,7 @@ Asap.Url.prototype = {
 		// undefined, we don't care 
 		} else { 
 
+			console.log(this.href);
 			this.type = this.types.UNDEFINED
 			this.valid = false;
 
@@ -580,7 +581,8 @@ Asap.Visit.prototype = {
 
 		Asap.evaluateScripts(this.source);
 
-		document.dispatchEvent(Asap.events.load, { visit: this });
+
+		document.dispatchEvent(new CustomEvent("asap:load", { "bubbles":false, "cancelable": false, "detail": this }));
 	},
 
 	updateBody: function(){

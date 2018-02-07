@@ -38,7 +38,7 @@ Asap.Url.prototype = {
 	 */
 	regexp: {
 		relative: /^(?:\.+?\/|[\w\.]+$)/,		// ex : ./test/index.html || ../../test.css || index.html
-		root: /^\/.+?$/,						// ex : /test/test.html
+		root: /^\/.*?$/,						// ex : /test/test.html
 		dir: /\/$/,								// ex : https://test.com/test/
 		fileOrDir: /\/([\w\.]+)?$/, 			// ex : https://test.com/test/index.html || https://test.com/test/
 		url: /https?:\/\/(?:((?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}|localhost))\b[-a-zA-Z0-9@:%_\+.~#?&\/=]*/i
@@ -117,6 +117,7 @@ Asap.Url.prototype = {
 		// undefined, we don't care 
 		} else { 
 
+			console.log(this.href);
 			this.type = this.types.UNDEFINED
 			this.valid = false;
 
