@@ -581,7 +581,6 @@ Asap.Visit.prototype = {
 
 		Asap.evaluateScripts(this.source);
 
-
 		document.dispatchEvent(new CustomEvent("asap:load", { "bubbles":false, "cancelable": false, "detail": this }));
 	},
 

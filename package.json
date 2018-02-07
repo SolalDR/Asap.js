@@ -1,6 +1,6 @@
 {
   "name": "asap-js",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Create a smooth and animated navigation through your web pages.",
   "main": "dist/js/asap-node.js",
   "scripts": {
