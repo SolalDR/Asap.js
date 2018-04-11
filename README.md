@@ -156,4 +156,5 @@ npm run watch
 - Implement animation system
 - Documentation
 - Coverage
+- Cmd + Click don't open a new tab
 
